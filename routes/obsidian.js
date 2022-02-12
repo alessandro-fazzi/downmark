@@ -3,7 +3,10 @@ const router = express.Router()
 
 const { getHTMLFromURL, getFileName, convertDate } = require('../app/utils')
 const { Readability } = require('@mozilla/readability')
+const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom')
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 const TurndownService = require('turndown')
 
 /* Optional vault name */
@@ -19,9 +22,10 @@ const today = convertDate(new Date());
 
 router.get('/', function(req, res, next) {
   (async (url, platform) => {
-    const result = await getHTMLFromURL(url);
+    const dirty = await getHTMLFromURL(url);
+    let clean = DOMPurify.sanitize(dirty, { USE_PROFILES: { html: true } });
 
-    var doc = new JSDOM(result, { url: req.query.u });
+    var doc = new JSDOM(clean, { url: req.query.u });
     let reader = new Readability(doc.window.document);
     let {title, content, excerpt, byline} = reader.parse();
 

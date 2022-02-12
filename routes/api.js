@@ -1,13 +1,13 @@
 var express = require('express');
 var router = express.Router();
-var getHTML = require('../app/getHTMLFromURL')
+var { getHTMLFromURL } = require('../app/utils')
 var { Readability } = require('@mozilla/readability')
 var { JSDOM } = require('jsdom')
 var TurndownService = require('turndown')
 
 router.get('/', function(req, res, next) {
   (async (url) => {
-    const result = await getHTML(url);
+    const result = await getHTMLFromURL(url);
 
     var doc = new JSDOM(result, { url: req.query.u });
     let reader = new Readability(doc.window.document);

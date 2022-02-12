@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "build:bookmarklet": "npx bookmarklet bookmarklet/bookmarklet_src.js bookmarklet/bookmarklet.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.4.2",
@@ -14,5 +15,8 @@
     "morgan": "~1.9.1",
     "readability-from-string": "^2.0.0",
     "turndown": "^7.1.1"
+  },
+  "devDependencies": {
+    "bookmarklet": "^3.0.0"
   }
 }

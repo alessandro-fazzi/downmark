@@ -5,6 +5,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
+var obsidianRouter = require('./routes/obsidian');
 
 var app = express();
 
@@ -21,5 +22,6 @@ app.use(function (req, res, next) {
 
 app.use('/', indexRouter);
 app.use('/api/v1/', apiRouter);
+app.use('/obsidian/', obsidianRouter);
 
 module.exports = app;

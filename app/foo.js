@@ -42,7 +42,6 @@ javascript: (async () => {
     }
     return fileName;
   }
-  const fileName = getFileName(title);
 
   async function fetchAsync(url) {
     let response = await fetch(url);
@@ -51,12 +50,11 @@ javascript: (async () => {
   }
 
   if (selection) {
-    // call service with selection param (not yet implemented)
-    // var markdownify = selection;
   } else {
-    // var markdownify = content;
-    let { title, content, excerpt, byline } = await fetchAsync('https://downmark.herokuapp.com/api/v1?u=' + encodeURIComponent(document.location))
   }
+
+  let { title, content, excerpt, byline } = await fetchAsync('https://downmark.herokuapp.com/api/v1?u=' + encodeURIComponent(document.location))
+  const fileName = getFileName(title);
 
   if (vault) {
     var vaultName = '&vault=' + encodeURIComponent(`${vault}`);

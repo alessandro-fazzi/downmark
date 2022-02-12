@@ -1,4 +1,4 @@
-javascript: (() => {
+javascript: (async () => {
 
   /* Optional vault name */
   const vault = "";
@@ -30,12 +30,6 @@ javascript: (() => {
 
   const selection = getSelectionHtml();
 
-  const {
-    title,
-    byline,
-    content
-  } = new Readability(document.cloneNode(true)).parse();
-
   function getFileName(fileName) {
     var userAgent = window.navigator.userAgent,
       platform = window.navigator.platform,
@@ -50,10 +44,18 @@ javascript: (() => {
   }
   const fileName = getFileName(title);
 
+  async function fetchAsync(url) {
+    let response = await fetch(url);
+    let data = await response.json();
+    return data;
+  }
+
   if (selection) {
-    var markdownify = selection;
+    // call service with selection param (not yet implemented)
+    // var markdownify = selection;
   } else {
-    var markdownify = content;
+    // var markdownify = content;
+    let { title, content, excerpt, byline } = await fetchAsync('https://downmark.herokuapp.com/api/v1?u=' + encodeURIComponent(document.location))
   }
 
   if (vault) {
@@ -61,14 +63,6 @@ javascript: (() => {
   } else {
     var vaultName = '';
   }
-
-  const markdownBody = new Turndown({
-    headingStyle: 'atx',
-    hr: '---',
-    bulletListMarker: '-',
-    codeBlockStyle: 'fenced',
-    emDelimiter: '*',
-  }).turndown(markdownify);
 
   var date = new Date();
 
@@ -89,7 +83,7 @@ javascript: (() => {
     + "source: " + document.URL + "\n"
     + "author: " + byline + "\n"
     + "---\n\n"
-    + markdownBody;
+    + content;
 
   document.location.href = "obsidian://new?"
     + "name=" + encodeURIComponent(folder + fileName)

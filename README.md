@@ -7,12 +7,14 @@ Translates a webpage into Markdown
 This is a POC.
 
 - [x] Copypasted code from the web
-- [x] Ignored security concerns
+- [x] Ignored a lot of security concerns
 - [x] Zero automatic tests
 - [x] Poor documentation
 - [x] Born unmaintained
 - [x] From 0 to web in 3 hours of a lazy weekend
 - [x] https://downmark.herokuapp.com is not assured to be online 
+
+Using my experimental webservice while it's publicly available is [unsecure and done at your own risk](#isitsecure)
 
 If you're ok and conscious about these facts, let's read an insufficient
 documentation.
@@ -80,7 +82,7 @@ Currently features are very limited:
 - vault customization is not implemented
 - the clipping will be created using Frontmatter for metadata
 
-All these limitation would be easy to remove, but do remind the discaimer: this is a POC!
+All these limitations would be easy to remove, but do remind the discaimer: this is a POC and a private experiment.
 
 ## Backstory and credits
 
@@ -110,4 +112,9 @@ A: Yep, it does
 **Q**: Does it work on the X browser?
 
 A: It works on FireFox for macOS and for Safari for iOS. Other combination not tested. Let's try!
+
+<a name="isitsecure"></a>
+**Q**: **Is it secure for me to test this soltion using `https://downmark.herokuapp.com` webservice?**
+
+A: I opensourced this repo (winning against shame) in order to make you able to read what the code does, but I cannot and do not want to demostrate the code party between the repo and the deployed webservice. You have to take my word for it and I don't mind if you can't. From the intrinsic code perspective this code should be at least as secure as the original bookmarklet, but the code on `https://downmark.herokuapp.com` is running away from you and I could be able to inject malicious code into the resulting markdown or redirect you to unwanted URLs and even register the sites you're clipping. I'm not doing any of these things, but you should not care a lot about what I'm saying I'm doing or not :) Just read the code, fork it, get the good ideas, share them and give me a feedback if you mind to. No more nor less.
 

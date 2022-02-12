@@ -11,12 +11,12 @@ router.get('/', function(req, res, next) {
 
     var doc = new JSDOM(result, { url: req.query.u });
     let reader = new Readability(doc.window.document);
-    let {title, content, excerpt} = reader.parse();
+    let {title, content, excerpt, byline} = reader.parse();
 
     var turndownService = new TurndownService()
     var markdown = turndownService.turndown(content)
 
-    res.json({ title, content: markdown, excerpt });
+    res.json({ title, content: markdown, excerpt, byline });
   })(req.query.u);
 });
 

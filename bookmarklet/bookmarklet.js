@@ -1,0 +1,1 @@
+javascript:(function()%7Bdocument.location.href%3D%22https%3A%2F%2Fdownmark.herokuapp.com%2Fobsidian%3Fu%3D%22%2BencodeURIComponent(document.location)%2B%22%26platform%3D%22%2Bwindow.navigator.platform%3B%7D)()

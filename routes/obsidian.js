@@ -8,6 +8,7 @@ const { JSDOM } = require('jsdom')
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 const TurndownService = require('turndown')
+var turndownPluginGfm = require('turndown-plugin-gfm')
 
 /* Optional vault name */
 const vault = "";
@@ -31,7 +32,12 @@ router.get('/', function(req, res, next) {
 
     const fileName = getFileName(title, platform);
 
-    var turndownService = new TurndownService()
+    var turndownService = new TurndownService({
+      preformattedCode: true,
+      codeBlockStyle: 'fenced',
+      bulletListMarker: '-'
+    }).keep(['pre']).use(turndownPluginGfm.gfm)
+
     let markdown = turndownService.turndown(content)
 
     if (vault) {

@@ -29,14 +29,14 @@ const getHTMLFromURL = (url) => {
 };
 
 const getFileName = (fileName, platform) => {
-  windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+  windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE']
 
   if (windowsPlatforms.indexOf(platform) !== -1) {
-    fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
+    fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-')
   } else {
-    fileName = fileName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-');
+    fileName = fileName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-')
   }
-  return fileName;
+  return fileName.slice(0, 100) + '.md'
 }
 
 const convertDate = (date) => {

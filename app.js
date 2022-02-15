@@ -20,6 +20,23 @@ app.use(function (req, res, next) {
   next();
 });
 
+const timeout = 20 * 1000;
+app.use((req, res, next) => {
+  // Set the timeout for all HTTP requests
+  req.setTimeout(timeout, () => {
+    let err = new Error('Request Timeout');
+    err.status = 408;
+    next(err);
+  });
+  // Set the server response timeout for all HTTP requests
+  res.setTimeout(timeout, () => {
+    let err = new Error('Service Unavailable');
+    err.status = 503;
+    next(err);
+  });
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/api/v1/', apiRouter);
 app.use('/obsidian/', obsidianRouter);

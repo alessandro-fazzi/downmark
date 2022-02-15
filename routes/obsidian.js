@@ -8,7 +8,10 @@ const { JSDOM } = require('jsdom')
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 const TurndownService = require('turndown')
-var turndownPluginGfm = require('turndown-plugin-gfm')
+const turndownPluginGfm = require('turndown-plugin-gfm')
+const fs = require('fs/promises');
+const path = require('path');
+const slugify = require('slugify')
 
 /* Optional vault name */
 const vault = "";
@@ -17,28 +20,46 @@ const vault = "";
 const folder = "Clippings/";
 
 /* Optional tags  */
-const tags = "clippings";
+var defaultTags = ["clippings"];
 
 const today = convertDate(new Date());
 
 router.get('/', function(req, res, next) {
-  (async (url, platform) => {
-    const dirty = await getHTMLFromURL(url);
-    let clean = DOMPurify.sanitize(dirty, { USE_PROFILES: { html: true } });
+  (async (url, platform, download, tags = []) => {
+    var tags = [...defaultTags, ...tags].join(' ')
 
-    var doc = new JSDOM(clean, { url: req.query.u });
+    var htmlContent = '';
+
+    try {
+      htmlContent = await getHTMLFromURL(url);
+    } catch (error) {
+      res.status(422).end()
+      return
+    }
+
+    let doc = new JSDOM(htmlContent, { url: req.query.u });
     let reader = new Readability(doc.window.document);
-    let {title, content, excerpt, byline} = reader.parse();
+    let result = reader.parse();
+    let title = result?.title || 'no title ' + require("crypto").randomBytes(8).toString('hex')
+    let content = result?.content || result?.excerpt || 'Cannot parse content...'
+    let byline = result?.byline || ''
 
-    const fileName = getFileName(title, platform);
+    const fileName = slugify(getFileName(title, platform));
 
     var turndownService = new TurndownService({
       preformattedCode: true,
       codeBlockStyle: 'fenced',
       bulletListMarker: '-'
-    }).keep(['pre']).use(turndownPluginGfm.gfm)
+    }).use(turndownPluginGfm.gfm)
 
-    let markdown = turndownService.turndown(content)
+    if (url.includes('https://github.com')) {
+      console.log('Keeping <pre> as HTML for github.com URLs')
+      turndownService.keep(['pre'])
+    }
+
+    let sanitizedContent = DOMPurify.sanitize(content, { USE_PROFILES: { html: true } });
+
+    let markdown = turndownService.turndown(sanitizedContent)
 
     if (vault) {
       var vaultName = '&vault=' + encodeURIComponent(`${vault}`);
@@ -54,13 +75,21 @@ router.get('/', function(req, res, next) {
       + "---\n\n"
       + markdown;
 
-    redirectTo = "obsidian://new?"
-      + "name=" + encodeURIComponent(folder + fileName)
-      + "&content=" + encodeURIComponent(fileContent)
-      + vaultName;
+    if (download == 'true') {
+      // ...
+    } else if (download == 'local' && req.hostname == 'localhost') {
+      fs.writeFile(path.join('.', folder, fileName), fileContent)
+      console.log('File saved: ' + folder + fileName)
+      res.status(201).end()
+    } else {
+      redirectTo = "obsidian://new?"
+        + "name=" + encodeURIComponent(folder + fileName)
+        + "&content=" + encodeURIComponent(fileContent)
+        + vaultName;
 
-    res.redirect(302, redirectTo)
-  })(req.query.u, req.query.platform);
+      res.redirect(302, redirectTo)
+    }
+  })(req.query.u, req.query.platform, req.query.download, req.query.tags);
 });
 
 module.exports = router;

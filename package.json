@@ -15,6 +15,7 @@
     "jsdom": "^19.0.0",
     "morgan": "~1.9.1",
     "readability-from-string": "^2.0.0",
+    "slugify": "^1.6.5",
     "turndown": "^7.1.1",
     "turndown-plugin-gfm": "^1.0.2"
   },

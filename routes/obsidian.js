@@ -37,8 +37,10 @@ router.get('/', function(req, res, next) {
       return
     }
 
-    let doc = new JSDOM(htmlContent, { url: req.query.u });
-    let reader = new Readability(doc.window.document);
+    let doc = new JSDOM(htmlContent, { url });
+    let reader = new Readability(doc.window.document, {
+      keepClasses: true
+    });
     let result = reader.parse();
     let title = result?.title || 'no title ' + require("crypto").randomBytes(8).toString('hex')
     let content = result?.content || result?.excerpt || 'Cannot parse content...'
@@ -51,11 +53,6 @@ router.get('/', function(req, res, next) {
       codeBlockStyle: 'fenced',
       bulletListMarker: '-'
     }).use(turndownPluginGfm.gfm)
-
-    if (url.includes('https://github.com')) {
-      console.log('Keeping <pre> as HTML for github.com URLs')
-      turndownService.keep(['pre'])
-    }
 
     let sanitizedContent = DOMPurify.sanitize(content, { USE_PROFILES: { html: true } });
 

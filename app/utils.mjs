@@ -2,6 +2,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http'
 import https from 'https'
+import { JSDOM } from 'jsdom'
+import { Readability } from '@mozilla/readability'
+import createDOMPurify from 'dompurify'
+let window = new JSDOM('').window;
+let DOMPurify = createDOMPurify(window);
+import slugify from 'slugify'
+import TurndownService from 'turndown'
+import turndownPluginGfm from 'turndown-plugin-gfm'
+import crypto from 'crypto'
+
+const defaultTags = ['clippings']
 
 const getHTMLFromURL = (url) => {
   return new Promise((resolve, reject) => {
@@ -13,6 +24,10 @@ const getHTMLFromURL = (url) => {
     }
 
     client.get(url, (resp) => {
+      // if ([301, 302, 307, 308].includes(resp.statusCode)) {
+      //   console.log('redirected to ' + resp.headers.location)
+      //   return getHTMLFromURL(resp.headers.location)
+      // }
       let data = '';
 
       // A chunk of data has been recieved.
@@ -39,7 +54,7 @@ const getFileName = (fileName, platform) => {
   } else {
     fileName = fileName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-')
   }
-  return fileName.slice(0, 100) + '.md'
+  return slugify(fileName.slice(0, 100) + '.md')
 }
 
 const convertDate = (date) => {
@@ -51,8 +66,71 @@ const convertDate = (date) => {
   return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
 }
 
+const parseHTML = (htmlContent, url) => {
+  let doc = new JSDOM(htmlContent, { url })
+  let reader = new Readability(doc.window.document, {
+    keepClasses: true
+  })
+  let result = reader.parse()
+
+  let title = result?.title || 'no title ' + crypto.randomBytes(8).toString('hex')
+  let content = result?.content || result?.excerpt || 'Cannot parse content...'
+  let byline = result?.byline || ''
+
+  const sanitizedContent = DOMPurify.sanitize(content, { USE_PROFILES: { html: true } })
+
+  return { title, content: sanitizedContent, byline, excerpt: result.excerpt }
+}
+
+const convertToMarkdown = (content) => {
+  const turndownService = new TurndownService({
+    preformattedCode: true,
+    codeBlockStyle: 'fenced',
+    bulletListMarker: '-'
+  }).use(turndownPluginGfm.gfm)
+
+  return turndownService.turndown(content)
+}
+
+const buildMarkdownWithFrontmatter = ({markdown, tags, url, byline}) => {
+  const markdownWithFrontmatter = "---\n"
+    + "date: " + convertDate(new Date()) + "\n"
+    + "tags: [" + [...defaultTags, ...tags].join(' ') + "]\n"
+    + "source: " + url + "\n"
+    + "author: " + byline + "\n"
+    + "---\n\n"
+    + markdown
+
+    return markdownWithFrontmatter
+}
+
+const buildObsidianURL = ({vault = null, folder = 'Clippings/', fileName, fileContent}) => {
+  let vaultName
+
+  if (vault) {
+    vaultName = '&vault=' + encodeURIComponent(`${vault}`)
+  } else {
+    vaultName = ''
+  }
+
+  return "obsidian://new?"
+    + "name=" + encodeURIComponent(folder + fileName)
+    + "&content=" + encodeURIComponent(fileContent)
+    + vaultName
+}
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export { getHTMLFromURL, getFileName, convertDate, __filename, __dirname };
+export {
+  getHTMLFromURL,
+  getFileName,
+  convertDate,
+  __filename,
+  __dirname,
+  parseHTML,
+  convertToMarkdown,
+  buildMarkdownWithFrontmatter,
+  buildObsidianURL
+};

@@ -1,26 +1,27 @@
 import express from 'express'
 let router = express.Router()
 
-import { getHTMLFromURL } from '../app/utils.mjs'
-import { Readability } from '@mozilla/readability'
-import createDOMPurify from 'dompurify'
-import { JSDOM } from 'jsdom'
-let window = new JSDOM('').window;
-let DOMPurify = createDOMPurify(window);
-import TurndownService from 'turndown'
-
+import {
+  getHTMLFromURL,
+  parseHTML,
+  convertToMarkdown
+} from '../app/utils.mjs'
 
 router.get('/', function(req, res, next) {
   (async (url) => {
-    const dirty = await getHTMLFromURL(url);
-    let clean = DOMPurify.sanitize(dirty, { USE_PROFILES: { html: true } });
+    var htmlContent = ''
 
-    var doc = new JSDOM(clean, { url: req.query.u });
-    let reader = new Readability(doc.window.document);
-    let {title, content, excerpt, byline} = reader.parse();
+    try {
+      htmlContent = await getHTMLFromURL(url)
+    } catch (error) {
+      console.error(error)
+      res.status(422).end()
+      return
+    }
 
-    var turndownService = new TurndownService()
-    var markdown = turndownService.turndown(content)
+    let { title, content, excerpt, byline } = parseHTML(htmlContent, url)
+
+    let markdown = convertToMarkdown(content)
 
     res.json({ title, content: markdown, excerpt, byline });
   })(req.query.u);

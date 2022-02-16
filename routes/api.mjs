@@ -1,13 +1,13 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express'
+let router = express.Router()
 
-const { getHTMLFromURL } = require('../app/utils')
-const { Readability } = require('@mozilla/readability')
-const createDOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom')
-const window = new JSDOM('').window;
-const DOMPurify = createDOMPurify(window);
-const TurndownService = require('turndown')
+import { getHTMLFromURL } from '../app/utils.mjs'
+import { Readability } from '@mozilla/readability'
+import createDOMPurify from 'dompurify'
+import { JSDOM } from 'jsdom'
+let window = new JSDOM('').window;
+let DOMPurify = createDOMPurify(window);
+import TurndownService from 'turndown'
 
 
 router.get('/', function(req, res, next) {
@@ -26,4 +26,4 @@ router.get('/', function(req, res, next) {
   })(req.query.u);
 });
 
-module.exports = router;
+export default router

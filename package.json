@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "node ./bin/www.mjs",
     "build:bookmarklet": "npx bookmarklet bookmarklet/bookmarklet_src.js bookmarklet/bookmarklet.js && npx bookmarklet bookmarklet/bookmarklet_src.dev.js bookmarklet/bookmarklet.dev.js"
   },
   "dependencies": {

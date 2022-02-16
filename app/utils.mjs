@@ -1,7 +1,10 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+import http from 'http'
+import https from 'https'
+
 const getHTMLFromURL = (url) => {
   return new Promise((resolve, reject) => {
-    const http = require('http'),
-          https = require('https');
 
     let client = http;
 
@@ -29,7 +32,7 @@ const getHTMLFromURL = (url) => {
 };
 
 const getFileName = (fileName, platform) => {
-  windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE']
+  let windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE']
 
   if (windowsPlatforms.indexOf(platform) !== -1) {
     fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-')
@@ -48,4 +51,8 @@ const convertDate = (date) => {
   return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
 }
 
-module.exports = { getHTMLFromURL, getFileName, convertDate };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export { getHTMLFromURL, getFileName, convertDate, __filename, __dirname };

@@ -46,14 +46,7 @@ const getHTMLFromURL = (url) => {
   });
 };
 
-const getFileName = (fileName, platform) => {
-  let windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE']
-
-  if (windowsPlatforms.indexOf(platform) !== -1) {
-    fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-')
-  } else {
-    fileName = fileName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-')
-  }
+const getFileName = (fileName) => {
   return slugify(fileName.slice(0, 100) + '.md')
 }
 

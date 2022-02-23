@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import express from 'express'
 let router = express.Router()
 
@@ -7,10 +9,17 @@ import {
   parseHTML,
   convertToMarkdown,
   buildMarkdownWithFrontmatter,
-  buildObsidianURL
+  __filename
 } from '../app/utils.mjs'
 
 router.get('/', function(req, res, next) {
+  if (req.query.download == 'local' && req.hostname != 'localhost') {
+    let error = new Error('Local download supported only running the webservice locally.');
+    console.error(error)
+    res.status(422).end()
+    next(error)
+  }
+
   (async (url, download, tags = []) => {
     var htmlContent = ''
 
@@ -29,11 +38,15 @@ router.get('/', function(req, res, next) {
     let markdown = convertToMarkdown(content)
 
     const fileContent = buildMarkdownWithFrontmatter({markdown, tags, url, byline})
-
-    let redirectToURL = buildObsidianURL({ fileName, fileContent })
-    res.set('Location', redirectToURL)
-    res.redirect(302, redirectToURL)
-  })(req.query.u, req.query.tags);
+    debugger
+    if (download == 'local') {
+      fs.writeFileSync(path.join('.', 'Clippings', fileName), fileContent)
+      console.log('File saved: ' + 'Clippings/' + fileName)
+      res.status(201).end()
+    } else {
+      // Send file to the client as inline attachment
+    }
+  })(req.query.u, req.query.download, req.query.tags);
 });
 
 export default router

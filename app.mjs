@@ -7,6 +7,7 @@ import { __dirname, __filename } from './app/utils.mjs'
 import indexRouter from './routes/index.mjs'
 import apiRouter from './routes/api.mjs'
 import obsidianRouter from './routes/obsidian.mjs'
+import downloadRouter from './routes/download.mjs'
 
 var app = express();
 
@@ -41,5 +42,6 @@ app.use((req, res, next) => {
 app.use('/', indexRouter);
 app.use('/api/v1/', apiRouter);
 app.use('/obsidian/', obsidianRouter);
+app.use('/download/', downloadRouter);
 
 export default app;

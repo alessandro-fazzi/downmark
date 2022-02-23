@@ -1,6 +1,6 @@
 # ⬇️✅ downMARK
 
-Translates a webpage into Markdown
+A webservice to translate a webpage into Markdown.
 
 ## Disclaimer
 
@@ -41,7 +41,7 @@ yarn install
 yarn start
 ```
 
-> NOTE: you need node and yarn
+> NOTE: you need node and yarn (no engines restriction yet. YOLO)
 
 ## Using the webservice - JSON
 
@@ -72,6 +72,23 @@ In the JSON response you'll get
 
 ## Using the webservice - Obsidian
 
+Directly save the resulting document into Obsidian. File will be saved in default vault under `Clippings/` folder.
+
+Endpoint:
+
+https://downmark.herokuapp.com/obsidian
+
+Params:
+
+- `u`: _String_ (possibly encoded) URL to download
+- `tags`: \[optional\] _Array(String)_ One or more tags. They will appended to the default `clippings` tag.
+
+Example:
+
+`https://downmark.herokuapp.com/?u=https%3A%2F%2Fwww.ilpost.it%2F2022%2F02%2F23%2Feuropa-debolezza-ucraina%2F&tags[]=foo&tags[]=bar`
+
+### Bookmarklet
+
 Make a bookmarklet into your browser with the following code: https://raw.githubusercontent.com/pioneerskies/downmark/main/bookmarklet/bookmarklet.js
 
 > NOTE: knowing how to create a bookmarklet is up to you and and your [search engine](https://duckduckgo.com/?q=how+to+create+a+bookmarklet&ia=web)
@@ -86,6 +103,16 @@ Currently features are very limited:
 
 All these limitations would be easy to remove, but do remind the discaimer: this is a POC and a private experiment.
 
+## Using the webservice - Download
+
+### Save on server
+
+TODO
+
+### Download from browser
+
+TODO
+
 ## Backstory and credits
 
 All the credits you could imagine goes to **@kepano** who wrote [this really smart version](https://gist.github.com/kepano/90c05f162c37cf730abb8ff027987ca3) of the bookmarklet and to **@Moonbase59** for his frontmatter version.
@@ -99,6 +126,7 @@ This version of the bookmarklet delegates all the work to the webservice, workin
 ## Customising the bookmarklet to connect to your webservice's instance
 
 - clone the repo
+- yarn install
 - edit `bookmarklet/bookmarklet_src.js` updating the domain from `downmark.herokuapp.com` to your
 - `yarn build:bookmarklet`
 - copy the resulting code from `bookmarklet/bookmarklet.js`

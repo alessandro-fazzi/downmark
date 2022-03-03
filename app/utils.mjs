@@ -47,7 +47,7 @@ const getHTMLFromURL = (url) => {
 };
 
 const getFileName = (fileName) => {
-  return slugify(fileName.slice(0, 100) + '.md')
+  return slugify(fileName.slice(0, 100) + '.md', { remove: /[*+~.()'"!:@\/\\]/g })
 }
 
 const convertDate = (date) => {
